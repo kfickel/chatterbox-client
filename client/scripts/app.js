@@ -3,6 +3,7 @@ var app = {
   server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages'
 };
 
+
 app.init = function() {
   // console.log('app.init called');
   // $('.username').on('click', function () {
@@ -19,6 +20,9 @@ app.init = function() {
 
 
 app.send = function(messageObj) {
+  
+  // $.post('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages', messageObj);
+  // console.log('posted');
   $.ajax({
   // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
@@ -30,14 +34,28 @@ app.send = function(messageObj) {
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.error('chatterbox: Failed to send message', data);
+      console.serror('chatterbox: Failed to send message', data);
     }
   });
   
 };
+
 app.fetch = function() {
-  var message = $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages', message);
-  console.log(message.responseJSON);
+  var message;
+  var message = $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages', function(data) {
+    // console.log(data);
+    messages = data.results;
+    console.log('here');
+    console.log(messages);
+    console.log('end');
+    for (var i = 0; i < messages.length; i++) {
+      app.renderMessage(messages[i]);
+    }
+  });
+  window.bigTest = message;
+  var arr = message.responseJSON;
+  console.log(message);
+  console.log(message);
   
   // $.ajax({
   // // This is the url you should use to communicate with the parse API server.
@@ -98,7 +116,8 @@ app.handleSubmit = function(event) {
   app.renderMessage(message);
   event.preventDefault();
   console.log(event);
-  //app.send(document.getElementById('send'));
+  app.send(message);
+  // app.send(document.getElementById('send'));
 };
 
 app.checkMessages = function() {
