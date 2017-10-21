@@ -4,22 +4,21 @@ var app = {
 };
 
 app.init = function() {
-  $('.username').on('click', function () {
-    app.handleUsernameClick();
-  });
-  $('#send .submit').submit(function() {
-    //debugger;
-    console.log('here');
-    app.handleSubmit();
-  });
+  // console.log('app.init called');
+  // $('.username').on('click', function () {
+  //   app.handleUsernameClick();
+  // });
+  // $('#send').on('submit', '.submit', app.handleSubmit(event));
+  // function() {
+  //   debugger;
+  //   console.log('here');
+  //   app.handleSubmit(event);
+  // });
 };
 
+
+
 app.send = function(messageObj) {
-  var message = {
-    username: 'shawndrost',
-    text: 'trololo',
-    roomname: '4chan'
-  };
   $.ajax({
   // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
@@ -37,20 +36,24 @@ app.send = function(messageObj) {
   
 };
 app.fetch = function() {
-  $.ajax({
-  // This is the url you should use to communicate with the parse API server.
-    url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
-    type: 'GET',
-    data: JSON.stringify(message),
-    contentType: 'application/json',
-    success: function (data) {
-      console.log('chatterbox: Message sent');
-    },
-    error: function (data) {
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.error('chatterbox: Failed to send message', data);
-    }
+  var message = $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages', function(message){
+    return message;
   });
+  console.log(JSON.stringify(message));
+  // $.ajax({
+  // // This is the url you should use to communicate with the parse API server.
+  //   url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
+  //   type: 'GET',
+  //   data: JSON.stringify(message),
+  //   contentType: 'application/json',
+  //   success: function (data) {
+  //     console.log('chatterbox: Message sent');
+  //   },
+  //   error: function (data) {
+  //     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+  //     console.error('chatterbox: Failed to recieve message', data);
+  //   }
+  // });
 };
 
 app.clearMessages = function() {
@@ -65,10 +68,11 @@ app.clearMessages = function() {
 app.renderMessage = function(message) {
   //added under chats
   //declare a new variable element user name
-  var username = `<div class='username'>${message.username}</div>`;
-  //append the name to the #main with the username class
-  $('#main').append(username);
-  var element = `<blink>${message.username}: ${message.text}</blink>`;
+  // var username = `<div class='username'>${message.username}</div>`;
+  // //append the name to the #main with the username class
+  // $('#main').append(username);
+  //$('#main').addClass('username');
+  var element = `<div class='${message.username} username'>${message.username}: ${message.text}</div>`;
   //var createEl = document.createElement('blink');
   $('#chats').append(element);
 };
@@ -81,12 +85,11 @@ app.handleUsernameClick = function () {
 //whatever blink .on click
 //add class username to #main.
 };
-app.handleSubmit = function() {
+app.handleSubmit = function(event) {
   var separateInfo = window.location.search;
   var startIndex = separateInfo.indexOf('username=');
   var username = separateInfo.slice(startIndex + 9, separateInfo.length);
-  var endMessageInd = separateInfo.indexOf('&submit=');
-  var text = separateInfo.slice(9, endMessageInd);
+  var text = $('#message').val();
   var message = {
     username: username,
     text: text,
@@ -94,7 +97,32 @@ app.handleSubmit = function() {
   };
   console.log(message);
   app.renderMessage(message);
+  event.preventDefault();
+  console.log(event);
   //app.send(document.getElementById('send'));
 };
+
+app.checkMessages = function() {
+  this.fetch();
+  setTimeout(app.checkMessage(), 10000);  
+}; 
+
+
+$(document).ready(function() {
+  console.log('app.init called');
+  $('.username').on('click', function () {
+    app.handleUsernameClick();
+  });
+  $('#send').on('click', '.submit', function() {
+    // debugger;
+    console.log('here');
+    app.handleSubmit(event);
+  });
+
+
+
+});
+
+
 
 
