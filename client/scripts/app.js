@@ -36,18 +36,17 @@ app.send = function(messageObj) {
   
 };
 app.fetch = function() {
-  var message = $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages', function(message){
-    return message;
-  });
-  console.log(JSON.stringify(message));
+  var message = $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages', message);
+  console.log(message.responseJSON);
+  
   // $.ajax({
   // // This is the url you should use to communicate with the parse API server.
   //   url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
   //   type: 'GET',
-  //   data: JSON.stringify(message),
+  //   data: message,
   //   contentType: 'application/json',
   //   success: function (data) {
-  //     console.log('chatterbox: Message sent');
+  //     console.log(data);
   //   },
   //   error: function (data) {
   //     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
