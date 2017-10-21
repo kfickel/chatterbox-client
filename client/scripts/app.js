@@ -64,9 +64,11 @@ app.fetch = function() {
   // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
-    data: message.results,
+    // data: message.results,
+    data: 'order=-createdAt',
     contentType: 'application/json',
     success: function (data) {
+      
       console.log(data);
       data = data.results;
       for (var i = data.length - 1; i >= 0; i--) {
@@ -95,12 +97,24 @@ app.clearMessages = function() {
 };
 
 app.renderMessage = function(message) {
+  var createElement = document.createElement('div');
+  var usernameEl = document.createElement('div');
+  //console.log(' hello ', createElement);
+  $(createElement).text(message.text);
+  var xssText = $(createElement).text();
+  $(usernameEl).text(message.username);
+  var xssUser = $(usernameEl).text();
+  
+  
+  //console.log('xss ', xssSafe);
+  // .log('TEXT ', $(createElement).text());
+  //username, message, room
   if (app.friends.includes('username ' + message.username)) {
-    var element = `<div class='username ${message.username} friend'><span>${message.username}</span>: ${message.text}</div>`;
+    var element = `<div class='username ${xssUser} friend'><span>${xssUser}</span>: ${xssText}</div>`;
     //var createEl = document.createElement('blink');
     // console.log('room select ', $('#roomSelect').val());
   } else {
-    var element = `<div class='username ${message.username}'><span>${message.username}</span>: ${message.text}</div>`;
+    var element = `<div class='username ${xssUser}'><span>${xssUser}</span>: ${xssText}</div>`;
   }
   //var createEl = document.createElement('blink');
   // console.log('room select ', $('#roomSelect').val());
@@ -122,7 +136,9 @@ app.renderMessage = function(message) {
 app.renderRoom = function(roomName) {
   var roomOption = document.getElementById('roomSelect');
   var option = document.createElement('option');
-  option.text = roomName;
+  $(option).text(roomName);
+  var xssRoom = $(option).text();
+  option.text = xssRoom;
   roomOption.add(option);
   // var option = `<option class=${roomName}>${roomName}</option>`;
   //option.addClass(roomName);
@@ -182,14 +198,21 @@ $(document).ready(function() {
     app.fetch();
     console.log('submit');
   });
-  $('#send').on('submit', function() {
+  $('#send').on('click', '.createRoom', function() {
     // debugger;
     console.log('submitted');
-    console.log(event);
-    app.handleSubmit();
+    // console.log(event);
+    var message = {
+      roomname: $('#message').val()
+    };
+    app.renderRoom();
+    console.log('step1');
+    app.send(message);
+    console.log('step2');
     app.clearMessages();
+    console.log('step3');
     app.fetch();
-    console.log('submit');
+    event.preventDefault();
   });
   $('#roomSelect').change(function() {
     console.log('hello');
@@ -201,9 +224,7 @@ $(document).ready(function() {
 
 });
 
-//send a message
-//username
 
-
-
+// CLEAN UP CODE
+//create room
 
