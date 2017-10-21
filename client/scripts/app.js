@@ -152,7 +152,9 @@ app.handleSubmit = function(event) {
   };
   console.log(message);
   //app.renderMessage(message);
-  event.preventDefault();
+  if (event) {
+    event.preventDefault();
+  }
   console.log(event);
   app.send(message);
   // app.send(document.getElementById('send'));
@@ -173,8 +175,18 @@ $(document).ready(function() {
   });
   $('#send').on('click', '.submit', function() {
     // debugger;
-    //console.log('here');
+    console.log('here');
+    console.log(event);
     app.handleSubmit(event);
+    app.clearMessages();
+    app.fetch();
+    console.log('submit');
+  });
+  $('#send').on('submit', function() {
+    // debugger;
+    console.log('submitted');
+    console.log(event);
+    app.handleSubmit();
     app.clearMessages();
     app.fetch();
     console.log('submit');
