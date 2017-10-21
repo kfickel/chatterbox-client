@@ -43,40 +43,46 @@ app.send = function(messageObj) {
 
 app.fetch = function() {
   //var message;
-  var message = $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages', function(data) {
-    // console.log('data ', data);
-    messages = data.results;
-    //console.log('here');
-    // console.log('messages ', messages);
-    //console.log('end');
-    for (var i = messages.length - 1; i >= 0; i--) {
-      app.renderMessage(messages[i]);
-      if (!app.roomnames.includes(messages[i].roomname)) {
-        app.roomnames.push(messages[i].roomname);
-        app.renderRoom(messages[i].roomname);
-      }
-      // console.log('roomname ', messages[i].roomname);
-    }
-  });
-  window.bigTest = message;
-  var arr = message.responseJSON;
-  // console.log('message.res ', message);
-  //console.log(message);
-  
-  // $.ajax({
-  // // This is the url you should use to communicate with the parse API server.
-  //   url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
-  //   type: 'GET',
-  //   data: message,
-  //   contentType: 'application/json',
-  //   success: function (data) {
-  //     console.log(data);
-  //   },
-  //   error: function (data) {
-  //     // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-  //     console.error('chatterbox: Failed to recieve message', data);
+  // var message = $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages', function(data) {
+  //   // console.log('data ', data);
+  //   messages = data.results;
+  //   //console.log('here');
+  //   // console.log('messages ', messages);
+  //   //console.log('end');
+  //   for (var i = messages.length - 1; i >= 0; i--) {
+  //     app.renderMessage(messages[i]);
+  //     if (!app.roomnames.includes(messages[i].roomname)) {
+  //       app.roomnames.push(messages[i].roomname);
+  //       app.renderRoom(messages[i].roomname);
+  //     }
+  //     // console.log('roomname ', messages[i].roomname);
   //   }
   // });
+
+  
+  $.ajax({
+  // This is the url you should use to communicate with the parse API server.
+    url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
+    type: 'GET',
+    data: message.results,
+    contentType: 'application/json',
+    success: function (data) {
+      console.log(data);
+      data = data.results;
+      for (var i = data.length - 1; i >= 0; i--) {
+        app.renderMessage(data[i]);
+        if (!app.roomnames.includes(data[i].roomname)) {
+          app.roomnames.push(data[i].roomname);
+          app.renderRoom(data[i].roomname);
+        }
+        // console.log('roomname ', messages[i].roomname);
+      }
+    },
+    error: function (data) {
+      // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
+      console.error('chatterbox: Failed to recieve message', data);
+    }
+  });
 };
 
 app.clearMessages = function() {
@@ -98,9 +104,13 @@ app.renderMessage = function(message) {
   }
   //var createEl = document.createElement('blink');
   // console.log('room select ', $('#roomSelect').val());
-  if ($('#roomSelect').val() === message.roomname) {
+  var currentRoom = $('#roomSelect').val() || 'lobby';
+  if (currentRoom === message.roomname) {
     $('#chats').append(element);
   }
+
+  // $('#chats').append(element);
+  
   //added under chats
   //declare a new variable element user name
   // var username = `<div class='username'>${message.username}</div>`;
@@ -108,6 +118,7 @@ app.renderMessage = function(message) {
   // $('#main').append(username);
   //$('#main').addClass('username');
 };
+
 app.renderRoom = function(roomName) {
   var roomOption = document.getElementById('roomSelect');
   var option = document.createElement('option');
@@ -125,7 +136,6 @@ app.renderRoom = function(roomName) {
 app.handleUsernameClick = function (event) {
   app.friends.push($(this).attr('class'));
   // event.addClass('friend');
-  console.log('handle ', this);
   $(this).addClass('friend');
 //whatever blink .on click
 //add class username to #main.
@@ -167,6 +177,7 @@ $(document).ready(function() {
     app.handleSubmit(event);
     app.clearMessages();
     app.fetch();
+    console.log('submit');
   });
   $('#roomSelect').change(function() {
     console.log('hello');
