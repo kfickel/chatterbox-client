@@ -142,7 +142,8 @@ $(document).ready(function() {
     app.clearMessages();
     app.fetch();
   });
-  app.fetch();
+  // app.fetch();
+  // setTimeout(app.fetch, 20000);
 });
 
 
