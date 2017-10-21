@@ -1,6 +1,8 @@
 var chatBox = 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages';
 var app = {
-  server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages'
+  server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
+  roomnames: [],
+  friends: []
 };
 
 
@@ -28,34 +30,38 @@ app.send = function(messageObj) {
     url: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
     type: 'POST',
     data: messageObj,
-    contentType: 'application/json',
+    //contentType: 'application/json',
     success: function (data) {
-      console.log('chatterbox: Message sent');
+      console.log('chatterbox: Message sent', data);
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.serror('chatterbox: Failed to send message', data);
+      console.log('chatterbox: Failed to send message', data);
     }
   });
-  
 };
 
 app.fetch = function() {
-  var message;
+  //var message;
   var message = $.get('http://parse.sfm6.hackreactor.com/chatterbox/classes/messages', function(data) {
-    // console.log(data);
+    // console.log('data ', data);
     messages = data.results;
-    console.log('here');
-    console.log(messages);
-    console.log('end');
-    for (var i = 0; i < messages.length; i++) {
+    //console.log('here');
+    // console.log('messages ', messages);
+    //console.log('end');
+    for (var i = messages.length - 1; i >= 0; i--) {
       app.renderMessage(messages[i]);
+      if (!app.roomnames.includes(messages[i].roomname)) {
+        app.roomnames.push(messages[i].roomname);
+        app.renderRoom(messages[i].roomname);
+      }
+      // console.log('roomname ', messages[i].roomname);
     }
   });
   window.bigTest = message;
   var arr = message.responseJSON;
-  console.log(message);
-  console.log(message);
+  // console.log('message.res ', message);
+  //console.log(message);
   
   // $.ajax({
   // // This is the url you should use to communicate with the parse API server.
@@ -83,22 +89,44 @@ app.clearMessages = function() {
 };
 
 app.renderMessage = function(message) {
+  if (app.friends.includes('username ' + message.username)) {
+    var element = `<div class='username ${message.username} friend'><span>${message.username}</span>: ${message.text}</div>`;
+    //var createEl = document.createElement('blink');
+    // console.log('room select ', $('#roomSelect').val());
+  } else {
+    var element = `<div class='username ${message.username}'><span>${message.username}</span>: ${message.text}</div>`;
+  }
+  //var createEl = document.createElement('blink');
+  // console.log('room select ', $('#roomSelect').val());
+  if ($('#roomSelect').val() === message.roomname) {
+    $('#chats').append(element);
+  }
   //added under chats
   //declare a new variable element user name
   // var username = `<div class='username'>${message.username}</div>`;
   // //append the name to the #main with the username class
   // $('#main').append(username);
   //$('#main').addClass('username');
-  var element = `<div class='${message.username} username'>${message.username}: ${message.text}</div>`;
-  //var createEl = document.createElement('blink');
-  $('#chats').append(element);
 };
 app.renderRoom = function(roomName) {
-  var element = `<div>${roomName}</div>`;
-  $('#roomSelect').append(element);
+  var roomOption = document.getElementById('roomSelect');
+  var option = document.createElement('option');
+  option.text = roomName;
+  roomOption.add(option);
+  // var option = `<option class=${roomName}>${roomName}</option>`;
+  //option.addClass(roomName);
+  // if (!$('option').hasClass(roomName)) {
+  //   $('#roomSelect').append(option);
+  // }
+  // var element = `<div>${roomName}</div>`;
+  //$('#roomSelect').add(roomName);
 };
 
-app.handleUsernameClick = function () {
+app.handleUsernameClick = function (event) {
+  app.friends.push($(this).attr('class'));
+  // event.addClass('friend');
+  console.log('handle ', this);
+  $(this).addClass('friend');
 //whatever blink .on click
 //add class username to #main.
 };
@@ -110,10 +138,10 @@ app.handleSubmit = function(event) {
   var message = {
     username: username,
     text: text,
-    roomname: 'cool'
+    roomname: $('#roomSelect').val()
   };
   console.log(message);
-  app.renderMessage(message);
+  //app.renderMessage(message);
   event.preventDefault();
   console.log(event);
   app.send(message);
@@ -128,18 +156,30 @@ app.checkMessages = function() {
 
 $(document).ready(function() {
   console.log('app.init called');
-  $('.username').on('click', function () {
-    app.handleUsernameClick();
+  $('#chats').on('click', '.username', function () {
+    app.handleUsernameClick.call(this);
+    app.clearMessages();
+    app.fetch();
   });
   $('#send').on('click', '.submit', function() {
     // debugger;
-    console.log('here');
+    //console.log('here');
     app.handleSubmit(event);
+    app.clearMessages();
+    app.fetch();
   });
-
+  $('#roomSelect').change(function() {
+    console.log('hello');
+    app.clearMessages();
+    app.fetch();
+  });
+  app.fetch();
 
 
 });
+
+//send a message
+//username
 
 
 
